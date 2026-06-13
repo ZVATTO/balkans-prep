@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="BP — P">
+<meta name="theme-color" content="#080808">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+<title>Balkans Prep — Partner Plan</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;700&family=DM+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#080808;--s1:#111;--s2:#161616;--border:#1e1e1e;--b2:#141414;
+  --text:#e0e0e0;--muted:#3a3a3a;--dim:#555;
+  --display:'Bebas Neue',Impact,sans-serif;
+  --body:'DM Sans',system-ui,sans-serif;
+  --mono:'DM Mono','Courier New',monospace;
+}
+html{background:var(--bg)}
+body{background:var(--bg);color:var(--text);font-family:var(--body);min-height:100vh;-webkit-font-smoothing:antialiased;padding-bottom:calc(20px + env(safe-area-inset-bottom))}
+::-webkit-scrollbar{width:3px;height:3px}
+::-webkit-scrollbar-thumb{background:#2a2a2a;border-radius:2px}
+
+.hdr{padding:52px 18px 16px;border-bottom:1px solid var(--border)}
+.hdr-eye{font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:.18em;text-transform:uppercase;margin-bottom:5px}
+.hdr-title{font-family:var(--display);font-size:clamp(30px,8vw,54px);line-height:1;letter-spacing:.04em;color:#fff}
+.hdr-title span{color:#FF8FD8}
+.hdr-sub{font-family:var(--mono);font-size:10px;color:var(--dim);margin-top:6px;letter-spacing:.06em}
+
+.tabs{display:flex;border-bottom:1px solid var(--border);overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{background:none;border:none;border-bottom:2px solid transparent;padding:12px 14px;cursor:pointer;white-space:nowrap;font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.1em;color:var(--muted);text-transform:uppercase;transition:all .2s;-webkit-tap-highlight-color:transparent}
+.tab.active{color:#FF8FD8;border-bottom-color:#FF8FD8}
+
+.panel{display:none;padding:18px 18px 40px;max-width:680px}
+.panel.active{display:block}
+
+.sec-title{font-family:var(--display);font-size:28px;color:#fff;letter-spacing:.04em;margin-bottom:4px}
+.sec-sub{font-family:var(--mono);font-size:10px;color:var(--dim);letter-spacing:.08em;margin-bottom:20px}
+
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px}
+.stat-card{background:var(--s1);border:1px solid var(--border);border-radius:10px;padding:14px}
+.stat-label{font-family:var(--mono);font-size:9px;color:var(--dim);letter-spacing:.12em;text-transform:uppercase;margin-bottom:4px}
+.stat-val{font-family:var(--display);font-size:26px;letter-spacing:.04em}
+.stat-note{font-size:11px;color:var(--dim);margin-top:2px;line-height:1.4}
+
+.info-card{background:var(--s1);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:14px}
+.info-card-title{font-family:var(--mono);font-size:10px;color:#FF8FD8;letter-spacing:.12em;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:7px}
+.info-card-title::before{content:'';display:block;width:2px;height:13px;background:#FF8FD8;border-radius:2px}
+.info-card p{font-size:13px;color:#bbb;line-height:1.7;margin-bottom:8px}
+.info-card p:last-child{margin-bottom:0}
+.info-card ul{padding-left:16px;margin-top:6px}
+.info-card li{font-size:13px;color:#bbb;line-height:1.8}
+
+.week-hdr{display:flex;align-items:center;gap:10px;margin-bottom:14px;padding:12px 14px;background:var(--s1);border:1px solid var(--border);border-radius:10px}
+.week-num{font-family:var(--display);font-size:32px;color:#FF8FD8;letter-spacing:.04em;line-height:1}
+.week-focus{font-size:12px;color:#aaa;line-height:1.5}
+.week-focus strong{color:#fff;display:block;font-size:13px;margin-bottom:2px}
+
+.day-card{border:1px solid var(--border);border-radius:10px;margin-bottom:10px;overflow:hidden}
+.day-header{display:flex;align-items:center;gap:12px;padding:13px 15px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:background .15s}
+.day-header:active{background:var(--s2)}
+.day-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.day-date{font-family:var(--mono);font-size:10px;color:var(--dim);min-width:52px}
+.day-name{flex:1;font-size:14px;font-weight:500;color:#ddd}
+.day-type{font-family:var(--mono);font-size:9px;padding:2px 7px;border-radius:3px;letter-spacing:.08em;white-space:nowrap}
+.day-chevron{font-size:11px;color:var(--muted);transition:transform .2s;margin-left:4px}
+.day-body{display:none;padding:0 15px 14px;border-top:1px solid var(--b2)}
+.day-body.open{display:block}
+.day-chevron.open{transform:rotate(180deg)}
+
+.ex-tbl{border:1px solid var(--b2);border-radius:8px;overflow:hidden;margin:10px 0}
+.ex-row{display:flex;align-items:center;padding:9px 12px;gap:10px;border-bottom:1px solid var(--b2)}
+.ex-row:last-child{border-bottom:none}
+.ex-n{font-family:var(--mono);font-size:9px;font-weight:700;min-width:18px;opacity:.5}
+.ex-info{flex:1;min-width:0}
+.ex-name{font-size:12px;font-weight:500;color:#d8d8d8}
+.ex-note{font-size:10px;color:#3a3a3a;font-style:italic;margin-top:1px}
+.ex-sets{font-family:var(--mono);font-size:10px;font-weight:700;white-space:nowrap;padding:2px 7px;border-radius:3px}
+
+.sub-sec{margin-top:10px}
+.sub-label{font-family:var(--mono);font-size:9px;color:var(--dim);letter-spacing:.12em;text-transform:uppercase;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.sub-items{background:var(--s2);border-radius:8px;overflow:hidden}
+.sub-item{padding:8px 12px;border-bottom:1px solid var(--b2);font-size:12px;color:#c0c0c0}
+.sub-item:last-child{border-bottom:none}
+.sub-item span{font-family:var(--mono);font-size:10px;margin-left:6px}
+
+.cardio-block{margin-top:10px;border-radius:8px;padding:12px 14px}
+.cardio-row{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:8px}
+.cardio-stat{flex:1;min-width:80px}
+.cardio-stat-label{font-family:var(--mono);font-size:8px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;margin-bottom:2px}
+.cardio-stat-val{font-family:var(--display);font-size:18px;letter-spacing:.04em}
+.cardio-note{font-size:11px;color:#4a4a4a;line-height:1.6}
+
+.prog-badge{display:inline-flex;align-items:center;gap:5px;background:#2a1a2a;border:1px solid #3a2a3a;border-radius:4px;padding:3px 8px;margin-top:8px}
+.prog-badge span{font-family:var(--mono);font-size:10px;color:#FF8FD8}
+
+.macro-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px}
+.macro-card{background:var(--s1);border:1px solid var(--border);border-radius:8px;padding:12px 8px;text-align:center}
+.macro-val{font-family:var(--display);font-size:22px;letter-spacing:.04em}
+.macro-label{font-family:var(--mono);font-size:8px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;margin-top:2px}
+.macro-note{font-size:9px;color:var(--muted);margin-top:2px}
+
+.supp-row{display:flex;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--b2);gap:12px}
+.supp-row:last-child{border-bottom:none}
+.supp-name{font-size:13px;font-weight:500;color:#ddd;min-width:140px}
+.supp-detail{font-size:11px;color:var(--dim);line-height:1.5}
+.supp-dose{font-family:var(--mono);font-size:10px;color:#FF8FD8;white-space:nowrap;margin-top:1px}
+
+@media(max-width:380px){
+  .macro-grid{grid-template-columns:1fr 1fr}
+  .stat-grid{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="hdr-eye">Movati Athletic · Partner Plan · Jun 13 – Jul 2 · Synced to Balkans Prep</div>
+  <div class="hdr-title">BALKANS PREP<br><span>PARTNER</span></div>
+  <div class="hdr-sub">28yo · 5'2" · 138 lbs · Trains alongside Reshad · Eating window 12–8pm</div>
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('overview')">Overview</button>
+  <button class="tab" onclick="switchTab('week1')">Week 1</button>
+  <button class="tab" onclick="switchTab('week2')">Week 2</button>
+  <button class="tab" onclick="switchTab('week3')">Week 3</button>
+  <button class="tab" onclick="switchTab('nutrition')">Nutrition</button>
+  <button class="tab" onclick="switchTab('sync')">Sync Guide</button>
+  <button class="tab" onclick="switchTab('recovery')">Recovery</button>
+</div>
+
+<!-- OVERVIEW -->
+<div class="panel active" id="tab-overview">
+  <div class="sec-title">PARTNER PLAN</div>
+  <div class="sec-sub">Synchronized with Balkans Prep · Same days · Same muscle groups · Scaled loading</div>
+
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="stat-label">Daily Calories</div>
+      <div class="stat-val" style="color:#FF8FD8">1,475</div>
+      <div class="stat-note">~375 kcal deficit from ~1,850 TDEE</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Protein Target</div>
+      <div class="stat-val" style="color:#00D4AA">138g</div>
+      <div class="stat-note">1g/lb bodyweight — non-negotiable</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Daily Steps</div>
+      <div class="stat-val" style="color:#FF8FD8">10–12K</div>
+      <div class="stat-note">10K wk 1 → 12K wks 2–3</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Zone 2 Ceiling</div>
+      <div class="stat-val" style="color:#FFB800">~125 bpm</div>
+      <div class="stat-note">65% of 192 bpm max (age 28)</div>
+    </div>
+  </div>
+
+  <div class="info-card">
+    <div class="info-card-title">How the Sync Works</div>
+    <p>Every training day is matched 1:1 with Reshad's Balkans Prep schedule. When he trains lower strength, you train lower strength. When he's on upper pull, you're on upper pull. You'll be at the same section of the gym working the same muscle groups — the difference is load, rest period, and cardio type.</p>
+    <p>Primary modifications: all barbell compounds are replaced with dumbbell or cable equivalents for better joint tracking at your loading range. HIIT cardio on Lower Glutes and Full Body days is replaced with Zone 2 steady-state — high-cortisol intervals compound water retention at this deficit. Rest periods are 75–90 sec vs his 45–60 sec.</p>
+  </div>
+
+  <div class="info-card">
+    <div class="info-card-title">The One-Core-Movement Rule</div>
+    <p>Each session contains exactly one direct core exercise. This is deliberate and should not be modified. Multiple ab circuits per week create persistent low-grade abdominal inflammation that reads visually as bloat. One movement per session keeps the core trained without the inflammatory response. The compound lower-body work hits the core adequately as a secondary system.</p>
+  </div>
+
+  <div class="info-card">
+    <div class="info-card-title">Week-by-Week Progression</div>
+    <p><strong style="color:#fff">Week 1 — Adaptation:</strong> Establish the pattern. Do not go to failure on anything. Complete all sessions at the prescribed weights with good form. Note every weight used.</p>
+    <p><strong style="color:#fff">Week 2 — Load:</strong> Add 2.5–5 lbs to every exercise where Week 1 felt manageable. Reduce rest by 15 sec. Extend post-workout cardio by 3–5 min.</p>
+    <p><strong style="color:#fff">Week 3 — Output:</strong> Match or slightly exceed Week 2 loads through Day 18. From Day 18 onward, taper — last heavy session is Day 18, active recovery only until departure.</p>
+  </div>
+</div>
+
+<!-- WEEKS rendered by JS -->
+<div class="panel" id="tab-week1"></div>
+<div class="panel" id="tab-week2"></div>
+<div class="panel" id="tab-week3"></div>
+
+<!-- NUTRITION -->
+<div class="panel" id="tab-nutrition">
+  <div class="sec-title">NUTRITION</div>
+  <div class="sec-sub">8-hour eating window · 12–8pm · 1,475 kcal target · 138g protein</div>
+
+  <div class="macro-grid">
+    <div class="macro-card">
+      <div class="macro-val" style="color:#FF8FD8">1,475</div>
+      <div class="macro-label">Calories</div>
+      <div class="macro-note">Daily target</div>
+    </div>
+    <div class="macro-card">
+      <div class="macro-val" style="color:#FF6B35">138g</div>
+      <div class="macro-label">Protein</div>
+      <div class="macro-note">1g/lb BW</div>
+    </div>
+    <div class="macro-card">
+      <div class="macro-val" style="color:#00D4AA">130g</div>
+      <div class="macro-label">Carbs</div>
+      <div class="macro-note">Around training</div>
+    </div>
+    <div class="macro-card">
+      <div class="macro-val" style="color:#C084FC">48g</div>
+      <div class="macro-label">Fat</div>
+      <div class="macro-note">Hormonal floor</div>
+    </div>
+  </div>
+
+  <div class="info-card">
+    <div class="info-card-title">Calorie Calculation</div>
+    <p>At 28 years old, 5'2", 138 lbs, and training 4–5 days/week, estimated TDEE is 1,820–1,870 kcal/day. The 1,475 kcal target creates a daily deficit of roughly 370–400 kcal — aggressive enough to produce visible change in 20 days without crossing below the threshold where muscle catabolism accelerates. Do not go lower than 1,400 on any day.</p>
+    <p><strong style="color:#fff">Active recovery days:</strong> Drop to 1,300–1,350 kcal. Training output is lower, so the deficit is maintained without the same fuel requirement. Keep protein at 138g regardless.</p>
+    <p><strong style="color:#fff">Departure day (Jul 2):</strong> Eat at maintenance — 1,850 kcal. A single refeed day refills glycogen and firms up muscle tissue for the beach. This is intentional, not a cheat day.</p>
+  </div>
+
+  <div class="info-card">
+    <div class="info-card-title">Why 138g Protein Is Non-Negotiable</div>
+    <p>At this level of caloric deficit combined with 6 training sessions per week, muscle catabolism is the primary risk. Research on aggressive short-term deficits shows that 0.8–1.0g protein per pound of bodyweight is the minimum threshold to preserve lean mass. Falling below this causes the body to catabolize muscle for fuel — which permanently lowers basal metabolic rate and produces a soft, undefined look rather than a toned one.</p>
+    <p>Hit protein first at every meal, before carbs or fat. If you're short at the end of the day, a scoop of whey isolate in water closes the gap cleanly.</p>
+  </div>
+
+  <div class="info-card">
+    <div class="info-card-title">Sample Daily Eating Window (12–8pm)</div>
+    <ul>
+      <li><strong>Meal 1 (~12pm, pre-workout):</strong> 150g Greek yogurt 0% + 1 scoop whey isolate + 80g oats + blueberries — approx. 55g protein, 55g carbs</li>
+      <li><strong>Post-workout shake (within 30 min):</strong> 1 scoop whey isolate + water — approx. 25g protein</li>
+      <li><strong>Meal 2 (~6–7pm, main meal):</strong> 180g chicken breast or white fish + 150g cooked white rice or sweet potato + 200g zucchini or spinach + 1 tbsp olive oil — approx. 55g protein, 60g carbs, 15g fat</li>
+      <li><strong>If short on protein:</strong> Add 2 eggs or 100g cottage cheese to either meal</li>
+    </ul>
+  </div>
+
+  <div class="info-card">
+    <div class="info-card-title">Anti-Bloat Food Rules (All 20 Days)</div>
+    <ul>
+      <li><strong>Cut immediately:</strong> Beans, lentils, chickpeas, raw onion, garlic, broccoli, cauliflower, cabbage, carbonated drinks, artificial sweeteners, deli meats, soft cheeses, alcohol</li>
+      <li><strong>Eat freely:</strong> Eggs, chicken breast, white fish, Greek yogurt (plain), white rice, oats, sweet potato, zucchini, cucumber, spinach, blueberries, strawberries, olive oil, avocado (moderate)</li>
+      <li><strong>Sodium:</strong> Days 1–13 keep under 1,500 mg/day. Days 14–17 drop to 1,000 mg. Days 18–20 under 800 mg.</li>
+      <li><strong>Water:</strong> 2.5–3L days 1–13. Increase to 3.5–4L days 14–17 (water load phase). Taper to 2L days 18–20.</li>
+    </ul>
+  </div>
+
+  <div class="info-card">
+    <div class="info-card-title">Eating Window Sync with Reshad</div>
+    <p>Reshad's OMAD window is 5–8pm. Your window is 12–8pm. These overlap from 5–8pm, meaning you can eat dinner together. The difference is you have a midday meal (around training) that he skips. This is intentional — at 138 lbs and a shorter stature, a full OMAD protocol at 1,475 kcal would put your per-meal protein requirement too high to be practical in one sitting.</p>
+  </div>
+</div>
+
+<!-- SYNC GUIDE -->
+<div class="panel" id="tab-sync">
+  <div class="sec-title">SYNC GUIDE</div>
+  <div class="sec-sub">What you are each doing, side by side</div>
+
+  <div class="info-card">
+    <div class="info-card-title">Day 1 & 8 & 15 — Lower Strength</div>
+    <p><strong style="color:#fff">Reshad:</strong> Goblet squat, single-leg RDL, step-ups, reverse lunges, seated leg curl, TKE, calf raises. MISS cardio 45–55 min.</p>
+    <p><strong style="color:#FF8FD8">You:</strong> Same movements at scaled loads. Same DB rack, adjacent space. Your cardio is 20–25 min incline walk instead of his longer MISS block — total session time is close because your rest periods are slightly longer.</p>
+  </div>
+
+  <div class="info-card">
+    <div class="info-card-title">Day 2 & 9 & 16 — Upper Push</div>
+    <p><strong style="color:#fff">Reshad:</strong> Cable chest press, incline DB press, cable laterals, seated DB shoulder press, tricep pushdowns, overhead cable extension. Finisher 3–4 rounds.</p>
+    <p><strong style="color:#FF8FD8">You:</strong> DB bench press replaces cable chest (same push pattern). Incline DB, DB laterals, DB shoulder press, tricep pushdowns — all same exercises, scaled weight. Finisher is 2 rounds vs his 3–4. You finish while he's on his last finisher round — use that time to begin your post-workout walk.</p>
+  </div>
+
+  <div class="info-card">
+    <div class="info-card-title">Day 3 & 10 — Active Recovery</div>
+    <p><strong style="color:#fff">Both:</strong> Walk together. Foam roll together. Identical protocol, identical duration. This is the easiest day to fully synchronize.</p>
+  </div>
+
+  <div class="info-card">
+    <div class="info-card-title">Day 4 & 11 & 18 — Lower Glutes</div>
+    <p><strong style="color:#fff">Reshad:</strong> Goblet squat, hip thrusts, single-leg glute bridge, KB deadlift, cable abduction, bird dogs. HIIT 25–30 min.</p>
+    <p><strong style="color:#FF8FD8">You:</strong> Same glute/hamstring focus. Hip thrusts are the anchor — same bench, same setup, take turns or use adjacent benches. Your cardio is 25 min Zone 2 incline walk (target 115–125 bpm) while he's on the assault bike or rower doing intervals.</p>
+  </div>
+
+  <div class="info-card">
+    <div class="info-card-title">Day 5 & 12 & 19 — Upper Pull</div>
+    <p><strong style="color:#fff">Reshad:</strong> Seated cable rows, wide lat pulldown, neutral lat pulldown, face pulls, incline DB curls, cable curls, hammer curls.</p>
+    <p><strong style="color:#FF8FD8">You:</strong> Identical cable station work — same machines, adjacent cables where possible. Row, pulldown, face pulls, bicep work. This is the most synchronizable session of the week; the only real difference is load and rest time.</p>
+  </div>
+
+  <div class="info-card">
+    <div class="info-card-title">Day 6 & 13 & 17 — Full Body Metabolic</div>
+    <p><strong style="color:#fff">Reshad:</strong> KB swings, goblet squat to press, RDL, cable row, DB push press, reverse lunges, Pallof press. HIIT 25–30 min. Rest 30–60 sec.</p>
+    <p><strong style="color:#FF8FD8">You:</strong> Same exercises, same density intent. Rest is 60–75 sec. Zone 2 bike or incline walk 20 min replaces his HIIT block. Sessions finish at roughly the same time.</p>
+  </div>
+
+  <div class="info-card">
+    <div class="info-card-title">Day 7 & 14 — Long Cardio</div>
+    <p><strong style="color:#fff">Reshad:</strong> Three cardio blocks totalling 60–75 min. Core finisher.</p>
+    <p><strong style="color:#FF8FD8">You:</strong> Two cardio blocks totalling 45–50 min. Same core movement. You finish 15–20 min before him — foam roll or stretch while he completes his third block.</p>
+  </div>
+</div>
+
+<!-- RECOVERY -->
+<div class="panel" id="tab-recovery">
+  <div class="sec-title">RECOVERY</div>
+  <div class="sec-sub">Sleep · Hormonal considerations · Supplements</div>
+
+  <div class="info-card">
+    <div class="info-card-title">Sleep — The Cortisol Variable</div>
+    <p>At this caloric deficit with 6 training sessions per week, sleep quality is the single biggest lever on whether the body looks soft or defined. Under 7 hours, cortisol stays elevated, subcutaneous water retention increases, and the fat loss you are generating gets masked. Target 7.5–8 hours nightly. Finish eating by 8pm. No phone in bed. The 20-min evening walk after the last meal lowers cortisol, reduces GI bloating, and improves sleep onset.</p>
+  </div>
+
+  <div class="info-card">
+    <div class="info-card-title">Hormonal Recovery Considerations</div>
+    <p>If you are in the luteal phase (roughly the two weeks before menstruation) during any part of this 20-day window, perceived exertion will be higher and recovery slower. This is not a reason to skip sessions — it is a reason to use the upper end of your rest period ranges and not push for new weight records during that window. Form and session completion matter more than load.</p>
+    <p>Iron is also relevant. If fatigue feels disproportionate to training load at any point, prioritize red meat and leafy greens in your eating window. A short iron supplement course is worth considering if that fatigue persists.</p>
+  </div>
+
+  <div class="info-card">
+    <div class="info-card-title">Supplements</div>
+    <div style="margin-top:4px">
+      <div class="supp-row">
+        <div><div class="supp-name">Whey Protein Isolate</div><div class="supp-dose">25–30g as needed</div></div>
+        <div class="supp-detail">Use to close the gap to 138g protein if food sources fall short. Isolate preferred — lower lactose, less GI bloating. Take within your eating window.</div>
+      </div>
+      <div class="supp-row">
+        <div><div class="supp-name">Magnesium Glycinate</div><div class="supp-dose">300mg before sleep</div></div>
+        <div class="supp-detail">Meaningfully improves sleep quality. Replenishes magnesium lost through sweat. Higher priority than creatine for cortisol management purposes.</div>
+      </div>
+      <div class="supp-row">
+        <div><div class="supp-name">Electrolytes</div><div class="supp-dose">1 serving/day</div></div>
+        <div class="supp-detail">Sodium, potassium, magnesium. Critical during an 8-hour eating window with daily training. Prevents mid-afternoon energy crashes. Take zero-calorie formulation during your fasting window.</div>
+      </div>
+      <div class="supp-row">
+        <div><div class="supp-name">Omega-3 (Fish Oil)</div><div class="supp-dose">2g EPA/DHA</div></div>
+        <div class="supp-detail">Anti-inflammatory. Supports cortisol regulation. Reduces exercise-induced inflammation that presents as puffiness and bloating. Take with your main evening meal.</div>
+      </div>
+      <div class="supp-row">
+        <div><div class="supp-name">Vitamin D3 + K2</div><div class="supp-dose">2,000–3,000 IU D3</div></div>
+        <div class="supp-detail">Standard recommendation for Ottawa. Fat-soluble — take with eating window. Supports hormonal function and immune response during high training load.</div>
+      </div>
+      <div class="supp-row">
+        <div><div class="supp-name">Creatine Monohydrate</div><div class="supp-dose">3g/day (optional)</div></div>
+        <div class="supp-detail">Preserves strength output in a deficit. Note: causes 1–2 lbs of intramuscular water retention (not subcutaneous — does not affect appearance). Optional call for this 20-day window.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="info-card">
+    <div class="info-card-title">Daily Recovery Protocol</div>
+    <ul>
+      <li><strong>Post-workout:</strong> 5 min foam roll — glutes, hamstrings, lats. Do the full 15-min session together on active recovery day.</li>
+      <li><strong>Evening walk:</strong> 20–30 min after last meal. Reduces bloating, lowers cortisol, improves sleep onset.</li>
+      <li><strong>Cold exposure (optional):</strong> 2 min cold shower post-workout. Reduces DOMS and supports cortisol clearance.</li>
+      <li><strong>Alcohol:</strong> None until July 2. Save it for the Balkans.</li>
+    </ul>
+  </div>
+</div>
+
+<script>
+const W={
+  lowerStrength:{name:"Lower Body — Strength",color:"#E8FF47",
+    ex:[
+      {n:"Dumbbell Goblet Squat",s:["3x12","3x12 (+2.5lbs)","3x10 (+5lbs)"],note:"Match Reshad's DB weight to start — scale down if form breaks at depth"},
+      {n:"Single-Leg DB RDL",s:["3x10/leg","3x12/leg","3x12/leg (+2.5lbs)"],note:"Full hamstring stretch, neutral spine"},
+      {n:"DB Reverse Lunges",s:["3x10/leg","3x12/leg","3x12/leg"],note:"Shin vertical, control the descent"},
+      {n:"DB Step-Ups",s:["3x10/leg","3x10/leg","3x12/leg"],note:"Same bench height as Reshad. Drive through the full foot."},
+      {n:"Seated Leg Curl",s:["3x12","3x12","3x15"],note:"3 sec eccentric — same machine, adjust stack"},
+      {n:"Terminal Knee Extensions (band)",s:["3x15","3x15","3x20"],note:"Quad isolation — band or cable at ankle height"},
+    ],
+    core:[{n:"Plank",r:"3×45 sec"}],
+    cardio:{type:"Incline Walk",dur:["20 min","22 min","25 min"],hr:"55–65% max HR (~115 bpm)",opt:"10–12% incline, 3.0–3.5 mph — while Reshad does his MISS block"},
+    rest:["90 sec","75 sec","60 sec"],
+    totalTime:["60 min","65 min","70 min"],
+  },
+  upperPush:{name:"Upper Body — Push",color:"#FF6B35",
+    ex:[
+      {n:"DB Bench Press",s:["3x10","3x10","3x12"],note:"35 lbs — Reshad is on cable chest press. Same push pattern, adjacent space."},
+      {n:"Incline DB Press",s:["3x10","3x10","3x12"],note:"15 lbs — elbows at 45 degrees, full stretch at bottom"},
+      {n:"DB Lateral Raises",s:["3x12","3x15","3x15"],note:"Slight forward lean, lead with elbow — mirrors his cable lateral cue"},
+      {n:"DB Shoulder Press",s:["3x10","3x12","3x12"],note:"15 lbs — same exercise, same DB rack area"},
+      {n:"Tricep Pushdowns (cable)",s:["3x12","3x15","3x15"],note:"20 lbs — same cable station as Reshad if adjacent cables available"},
+      {n:"Overhead DB Tricep Extension",s:["3x12","3x12","3x15"],note:"17.5 lbs — seated version for stability"},
+    ],
+    core:[{n:"Dead Bug",r:"3×10/side"}],
+    finisher:{rounds:["2 rounds","2 rounds","3 rounds"],items:["KB Swings — 12 reps","Battle Ropes — 20 sec","DB Step-Ups — 8/leg","Plank Hold — 30 sec"]},
+    cardio:{type:"Incline Walk",dur:["20 min","20 min","22 min"],hr:"50–60% max HR",opt:"Active recovery pace — begin while Reshad finishes his last finisher round"},
+    rest:["90 sec","75 sec","60 sec"],
+    totalTime:["65 min","70 min","70 min"],
+  },
+  activeRecovery:{name:"Active Recovery",color:"#60A5FA",
+    ex:[],
+    sessions:[
+      {label:"Cardio (together)",items:["Easy incline treadmill walk (2.5 mph, 5% incline) or outdoor walk — same pace as Reshad"],dur:["40 min","40 min","40 min"]},
+      {label:"Foam Rolling (together)",items:["Calves, quads, IT band, lats, thoracic spine — shared foam roll stations"],dur:["15 min","15 min","15 min"]},
+      {label:"Mobility (together)",items:["Hip flexor stretch, pigeon pose, shoulder circles, cat-cow — identical protocol"],dur:["10 min","10 min","10 min"]},
+    ],
+    totalTime:["65 min","65 min","65 min"],
+  },
+  lowerGlutes:{name:"Lower Body — Glutes & Hamstrings",color:"#00D4AA",
+    ex:[
+      {n:"Hip Thrusts (barbell or DB)",s:["4x12","4x12","4x15"],note:"55 lbs total. Full glute squeeze at top. Same bench as Reshad — take turns or use adjacent benches."},
+      {n:"Goblet Squat",s:["3x15","4x15","4x15"],note:"Glute-focused depth. Heels elevated on plate if needed."},
+      {n:"Single-Leg Glute Bridge",s:["3x12/leg","3x12/leg","4x12/leg"],note:"Ground version. Same posterior chain load, zero knee stress."},
+      {n:"Cable Pull-Through",s:["3x12","3x12","3x12"],note:"60 lbs — hip hinge, chest tall. Same cable machine."},
+      {n:"Cable Hip Abduction",s:["3x15","3x15","4x15"],note:"50 lbs — slow and controlled"},
+      {n:"Glute Kickback Machine",s:["3x12","3x12","3x15"],note:"75 lbs. Full extension, 1 sec pause at top."},
+    ],
+    core:[{n:"Dead Bug",r:"3×12/side"}],
+    cardio:{type:"Zone 2 Incline Walk",dur:["25 min","25 min","28 min"],hr:"60–65% max HR (~115–125 bpm)",opt:"Incline treadmill 10%, 3.0 mph. Reshad is on the assault bike doing HIIT. You stay at steady zone 2."},
+    rest:["90 sec","75 sec","75 sec"],
+    totalTime:["75 min","80 min","85 min"],
+    note:"Do not match Reshad's HIIT on this day. Zone 2 achieves similar caloric output without the cortisol spike that compounds water retention at your deficit.",
+  },
+  upperPull:{name:"Upper Body — Pull",color:"#C084FC",
+    ex:[
+      {n:"Seated Cable Rows",s:["3x10","3x12","3x12"],note:"70 lbs (row machine). Full scapular retraction — same cue as Reshad, same machine area."},
+      {n:"Lat Pulldown — Wide Grip",s:["3x10","3x10","3x12"],note:"55 lbs. Pull to upper chest — adjacent cable station to Reshad if available."},
+      {n:"Lat Pulldown — Neutral Grip",s:["3x10","3x10","3x12"],note:"Slightly lighter than wide grip. Elbows drive to hips for lat thickness."},
+      {n:"Cable Face Pulls",s:["3x15","3x15","3x15"],note:"Never skip. Rear delts and posture. Same movement, same station."},
+      {n:"Incline DB Bicep Curls",s:["3x10","3x12","3x12"],note:"Full stretch at bottom, no swinging. Same bench setup."},
+      {n:"Cable Bicep Curls",s:["3x12","3x15","3x15"],note:"Constant tension throughout ROM — mirror Reshad's cable curl station."},
+    ],
+    core:[{n:"Hollow Body Hold",r:"3×25 sec"}],
+    finisher:{rounds:["2 rounds","3 rounds","3 rounds"],items:["Medicine Ball Slams — 12 reps","Jump Rope — 40 reps","DB Thrusters — 10 reps","Dead Bug — 20 sec"]},
+    cardio:{type:"Incline Walk",dur:["20 min","20 min","22 min"],hr:"50–60% max HR",opt:"Active recovery pace — matches Reshad's LISS block timing"},
+    rest:["90 sec","75 sec","60 sec"],
+    totalTime:["65 min","70 min","70 min"],
+  },
+  fullBodyMetabolic:{name:"Full Body — Metabolic",color:"#FF3D6B",
+    ex:[
+      {n:"KB Swings",s:["3x15","3x20","4x20"],note:"Hip drive — same movement as Reshad, lighter KB. Explosive, controlled landing."},
+      {n:"DB Goblet Squat to Press",s:["3x12","3x12","3x15"],note:"10 lbs — squat then press overhead. Same movement, scaled weight."},
+      {n:"DB Romanian Deadlift",s:["3x12","3x12","3x12"],note:"Hip hinge, soft knee, hamstring stretch — same movement as Reshad"},
+      {n:"Seated Cable Row",s:["3x12","3x12","3x12"],note:"Keep HR elevated — 60 sec rest max on this exercise"},
+      {n:"DB Push Press",s:["3x10","3x10","3x12"],note:"15 lbs — leg drive into overhead press. Same movement."},
+      {n:"Reverse Lunges (alternating)",s:["3x10/leg","3x12/leg","3x12/leg"],note:"Bodyweight or 5 lb DBs. Mirror Reshad's reverse lunge."},
+    ],
+    core:[{n:"Cable Woodchoppers",r:"3×12/side"}],
+    cardio:{type:"Zone 2 Bike or Walk",dur:["20 min","22 min","22 min"],hr:"60–65% max HR (~115–125 bpm)",opt:"Stationary bike or incline walk at steady zone 2. Reshad is doing HIIT — you finish at roughly the same time with zone 2 duration."},
+    rest:["75 sec","60 sec","60 sec"],
+    totalTime:["60 min","65 min","65 min"],
+    note:"Shorter rest than your other days — this is a metabolic session. Zone 2 cardio replaces Reshad's HIIT. Same total time, different output curve.",
+  },
+  longCardio:{name:"Dedicated Cardio",color:"#FFB800",
+    ex:[],
+    sessions:[
+      {label:"Block 1 — Warmup (together)",items:["Incline Walk (3.0 mph, 8% incline) — same machine as Reshad's Block 1"],dur:["20 min","22 min","22 min"]},
+      {label:"Block 2 — Steady State",items:["Stationary Bike at 65% HR — Reshad moves to rowing or bike, you maintain steady state"],dur:["20 min","22 min","22 min"]},
+    ],
+    core:[{n:"Hanging Knee Raises",r:"3×12"}],
+    totalTime:["50 min","55 min","55 min"],
+    note:"Two blocks vs Reshad's three. You finish before his third block. Use that time to foam roll or stretch while he completes his final cardio push.",
+  },
+  lightCardio:{name:"Light Cardio + Deload",color:"#60A5FA",
+    ex:[],
+    sessions:[
+      {label:"Easy Cardio (together)",items:["Incline walk or light cycle at 50–55% HR — same pace as Reshad"],dur:["30 min","—","—"]},
+      {label:"Mobility (together)",items:["Full body stretch, foam roll — focus on hip flexors and thoracic for travel"],dur:["15 min","—","—"]},
+    ],
+    totalTime:["45 min","—","—"],
+    note:"Travel day. Eat at maintenance today (1,850 kcal) — the refeed firms up muscle definition. Walk everywhere in the Balkans.",
+  },
+};
+
+const SCHEDULE=[
+  {date:"Fri Jun 13",wk:0},{date:"Sat Jun 14",wk:0},{date:"Sun Jun 15",wk:0},
+  {date:"Mon Jun 16",wk:0},{date:"Tue Jun 17",wk:0},{date:"Wed Jun 18",wk:0},{date:"Thu Jun 19",wk:0},
+  {date:"Fri Jun 20",wk:1},{date:"Sat Jun 21",wk:1},{date:"Sun Jun 22",wk:1},
+  {date:"Mon Jun 23",wk:1},{date:"Tue Jun 24",wk:1},{date:"Wed Jun 25",wk:1},{date:"Thu Jun 26",wk:1},
+  {date:"Fri Jun 27",wk:2},{date:"Sat Jun 28",wk:2},{date:"Sun Jun 29",wk:2},
+  {date:"Mon Jun 30",wk:2},{date:"Tue Jul 1",wk:2},{date:"Wed Jul 2",wk:2},
+];
+const TYPES=[
+  'lowerStrength','upperPush','activeRecovery','lowerGlutes','upperPull','fullBodyMetabolic','longCardio',
+  'lowerStrength','upperPush','activeRecovery','lowerGlutes','upperPull','fullBodyMetabolic','longCardio',
+  'lowerStrength','upperPush','fullBodyMetabolic','lowerGlutes','upperPull','lightCardio',
+];
+
+const WEEK_INFO=[
+  {num:"01",focus:"Adaptation",theme:"Establish the pattern. Form first. Note every weight used — these become your Week 2 baselines. Train alongside Reshad every session.",prog:"Complete all sessions. Record weights. 10,000+ steps/day. Cut FODMAP foods today. Sodium under 1,500 mg."},
+  {num:"02",focus:"Intensification",theme:"Add 2.5–5 lbs wherever Week 1 felt manageable. Rest 15 sec less per set. Extend cardio 3–5 min. Stomach should be visibly flatter by Day 10.",prog:"Load goes up. Steps to 12,000+/day. Water load begins Day 14 (3.5–4L). Sodium drops to 1,000 mg from Day 14."},
+  {num:"03",focus:"Peak and Taper",theme:"Last heavy session is Day 18. Days 19–20 are active recovery only. Departure day eat at maintenance. Let the body tighten for the beach.",prog:"Match or beat Week 2 loads through Day 18. Then stop pushing. Water taper to 2L, sodium under 800 mg from Day 18."},
+];
+
+function hex(h,a){return h+Math.round(a*255).toString(16).padStart(2,'0')}
+
+function renderWeek(weekIdx,panelId){
+  const wi=WEEK_INFO[weekIdx];
+  const days=SCHEDULE.filter(d=>d.wk===weekIdx);
+  const dayIndices=SCHEDULE.map((d,i)=>d.wk===weekIdx?i:-1).filter(i=>i>=0);
+
+  let html=`
+    <div class="week-hdr">
+      <div class="week-num">${wi.num}</div>
+      <div>
+        <div class="week-focus"><strong>Week ${weekIdx+1}: ${wi.focus}</strong>${wi.theme}</div>
+        <div class="prog-badge"><span>↑ ${wi.prog}</span></div>
+      </div>
+    </div>
+  `;
+
+  dayIndices.forEach((di)=>{
+    const d=SCHEDULE[di];
+    const wtype=TYPES[di];
+    const w=W[wtype];
+    const wk=d.wk;
+    const dayId=`day-${di}`;
+    html+=`
+      <div class="day-card">
+        <div class="day-header" onclick="toggleDay('${dayId}')">
+          <div class="day-dot" style="background:${w.color}"></div>
+          <div class="day-date">${d.date}</div>
+          <div class="day-name">${w.name}</div>
+          <div class="day-type" style="background:${hex(w.color,0.1)};color:${w.color}">${w.totalTime?w.totalTime[Math.min(wk,2)]:''}</div>
+          <div class="day-chevron" id="chev-${dayId}">▼</div>
+        </div>
+        <div class="day-body" id="${dayId}">
+          ${renderDayBody(w,wk)}
+        </div>
+      </div>
+    `;
+  });
+
+  document.getElementById(panelId).innerHTML=`
+    <div class="sec-title">WEEK ${weekIdx+1}</div>
+    <div class="sec-sub">${wi.focus} · ${days[0].date.split(' ').slice(1).join(' ')} – ${days[days.length-1].date.split(' ').slice(1).join(' ')}</div>
+    ${html}
+  `;
+}
+
+function renderDayBody(w,wk){
+  let html='';
+  const wi=Math.min(wk,2);
+
+  if(w.note){html+=`<div style="margin-top:10px;padding:8px 10px;background:#1a1218;border:1px solid #2a1a28;border-radius:6px;font-size:11px;color:#aa88aa;font-style:italic">${w.note}</div>`;}
+
+  if(w.sessions&&w.sessions.length){
+    html+='<div class="sub-sec">';
+    w.sessions.forEach(s=>{
+      const dur=s.dur?s.dur[wi]:'';
+      html+=`<div class="sub-label"><span style="display:inline-block;width:2px;height:11px;background:${w.color};border-radius:2px;margin-right:4px"></span><span style="color:${w.color}">${s.label}</span>${dur?`<span style="margin-left:auto;color:var(--dim);font-family:var(--mono);font-size:9px">${dur}</span>`:''}</div>`;
+      html+='<div class="sub-items">';
+      s.items.forEach(item=>{html+=`<div class="sub-item">${item}</div>`;});
+      html+='</div>';
+    });
+    html+='</div>';
+  }
+
+  if(w.ex&&w.ex.length){
+    const rest=w.rest?w.rest[wi]:'—';
+    html+=`
+      <div class="sub-sec">
+        <div class="sub-label"><span style="display:inline-block;width:2px;height:11px;background:${w.color};border-radius:2px;margin-right:4px"></span>
+          <span style="color:#555">Weights · ${w.ex.length} exercises · Rest: ${rest}</span>
+        </div>
+        <div class="ex-tbl">
+          ${w.ex.map((ex,i)=>`
+            <div class="ex-row">
+              <div class="ex-n" style="color:${w.color}">${String(i+1).padStart(2,'0')}</div>
+              <div class="ex-info">
+                <div class="ex-name">${ex.n}</div>
+                ${ex.note?`<div class="ex-note">${ex.note}</div>`:''}
+              </div>
+              <div class="ex-sets" style="color:${w.color};background:${hex(w.color,0.08)}">${ex.s[wi]}</div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  }
+
+  if(w.core&&w.core.length){
+    html+=`
+      <div class="sub-sec">
+        <div class="sub-label"><span style="display:inline-block;width:2px;height:11px;background:${w.color};border-radius:2px;margin-right:4px"></span><span style="color:#555">Core · 3 rounds · 1 movement only</span></div>
+        <div class="sub-items">
+          ${w.core.map(c=>`<div class="sub-item">${c.n} <span style="color:${w.color}">${c.r}</span></div>`).join('')}
+        </div>
+      </div>
+    `;
+  }
+
+  if(w.finisher){
+    const rounds=w.finisher.rounds[wi];
+    html+=`
+      <div class="sub-sec">
+        <div class="sub-label"><span style="display:inline-block;width:2px;height:11px;background:${w.color};border-radius:2px;margin-right:4px"></span><span style="color:${w.color}">Finisher · ${rounds} · 75 sec rest</span></div>
+        <div class="sub-items">
+          ${w.finisher.items.map(item=>`<div class="sub-item">${item}</div>`).join('')}
+        </div>
+      </div>
+    `;
+  }
+
+  if(w.cardio){
+    const dur=w.cardio.dur[wi];
+    html+=`
+      <div class="cardio-block" style="background:${hex(w.color,0.05)};border:1px solid ${hex(w.color,0.18)}">
+        <div class="sub-label" style="margin-bottom:8px"><span style="display:inline-block;width:2px;height:11px;background:${w.color};border-radius:2px;margin-right:4px"></span><span style="color:${w.color}">${w.cardio.type}</span></div>
+        <div class="cardio-row">
+          <div class="cardio-stat">
+            <div class="cardio-stat-label">Duration</div>
+            <div class="cardio-stat-val" style="color:${w.color}">${dur}</div>
+          </div>
+          <div class="cardio-stat">
+            <div class="cardio-stat-label">Heart Rate</div>
+            <div class="cardio-stat-val" style="color:#5a5a5a">${w.cardio.hr}</div>
+          </div>
+        </div>
+        <div class="cardio-note">${w.cardio.opt}</div>
+      </div>
+    `;
+  }
+
+  return html||'<div style="padding:10px 0;font-size:13px;color:#555">Active recovery. Walk together 40 min easy pace.</div>';
+}
+
+function toggleDay(id){
+  const body=document.getElementById(id);
+  const chev=document.getElementById('chev-'+id);
+  const open=body.classList.toggle('open');
+  if(chev){chev.classList.toggle('open',open);}
+}
+
+function switchTab(name){
+  document.querySelectorAll('.tab').forEach((t,i)=>{
+    const names=['overview','week1','week2','week3','nutrition','sync','recovery'];
+    t.classList.toggle('active',names[i]===name);
+  });
+  document.querySelectorAll('.panel').forEach(p=>{
+    p.classList.toggle('active',p.id==='tab-'+name);
+  });
+}
+
+renderWeek(0,'tab-week1');
+renderWeek(1,'tab-week2');
+renderWeek(2,'tab-week3');
+
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').catch(()=>{});});
+}
+</script>
+</body>
+</html>
